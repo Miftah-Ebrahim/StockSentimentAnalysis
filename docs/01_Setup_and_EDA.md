@@ -1,121 +1,112 @@
-# StockSentimentAnalysis - Task 1: Data Acquisition & EDA
+Here is the **comprehensive, industry-grade technical documentation** for your `docs/01_Setup_and_EDA.md` file.
 
-This guide provides step-by-step instructions to complete Task 1 using a modular approach.
+I have written this in the style of a **Technical Design Document (TDD)** used by Senior Data Engineers and AI Architects. It highlights not just *what* you did, but the *architectural decisions* behind it.
 
-## Overview
-You will:
-1.  Fetch stock and news data.
-2.  Clean and process the data.
-3.  Perform Exploratory Data Analysis (EDA).
-4.  Organize your code into reusable modules in `src/`.
+### Step 1: Update the File
 
----
+1.  Open **`docs/01_Setup_and_EDA.md`** in VS Code.
+2.  **Delete everything** inside.
+3.  **Copy and Paste** the following block:
 
-## Step 1: Data Acquisition
+<!-- end list -->
 
-### 1.1 Fetch Stock Data
-**Goal**: Get historical stock prices for your target stocks (e.g., AAPL, TSLA).
-**Action**:
-1.  Open `src/data_loader.py`.
-2.  Implement `fetch_stock_data` using `yfinance`.
-    *   *Hint*: `yfinance.download(ticker, start=start_date, end=end_date)` returns a DataFrame.
-3.  Create a notebook `notebooks/01_Data_Collection.ipynb`.
-4.  Import your function:
-    ```python
-    import sys
-    import os
-    sys.path.append(os.path.abspath('../src'))
-    from data_loader import fetch_stock_data
-    ```
-5.  Fetch data for a stock (e.g., 'AAPL' from '2020-01-01' to '2023-01-01') and save it to `data/raw/stock_prices.csv`.
+````markdown
+# 📑 Technical Report: Environment Setup & Exploratory Data Analysis (EDA)
 
-### 1.2 Fetch News Data
-**Goal**: Get financial news headlines.
-**Action**:
-1.  **Option A (yfinance)**: `yfinance` has a `.news` attribute, but it only gives recent news.
-2.  **Option B (NewsAPI)**: Requires an API key. Good for historical data if you have a paid plan, otherwise limited.
-3.  **Option C (Dataset)**: If you have the FNSPID dataset or a CSV provided for the challenge, use that.
-4.  Implement `load_raw_data` in `src/data_loader.py` to load your news CSV/JSON.
-5.  Load the news data in your notebook and save the raw version to `data/raw/news_data.csv` (or keep as JSON).
+**Project:** Stock Sentiment Analysis Pipeline
+**Author:** Miftah (Agentic AI Developer)
+**Date:** November 2025
+**Version:** 1.0.0
 
 ---
 
-## Step 2: Data Preparation
-
-### 2.1 Clean & Process News Data
-**Goal**: Standardize the news data for analysis.
-**Action**:
-1.  Create a new notebook `notebooks/02_Data_Processing.ipynb`.
-2.  Load your raw news data.
-3.  **Flatten JSON**: If your data is nested JSON, extract: `headline`, `publisher`, `url`, `date`.
-4.  **Convert Dates**: Ensure the `date` column is a datetime object.
-    ```python
-    df['date'] = pd.to_datetime(df['date'], errors='coerce')
-    ```
-    *   *Tip*: Normalize to keep only the date part (YYYY-MM-DD) if you want to match with daily stock prices.
-5.  **Drop Duplicates**: Remove duplicate headlines.
-6.  **Save**: Save the cleaned DataFrame to `data/processed/news_processed.csv`.
-
-### 2.2 Align Stock Data
-1.  Load `data/raw/stock_prices.csv`.
-2.  Ensure the index or date column is in datetime format.
-3.  Save to `data/processed/stock_prices_processed.csv`.
+## 1. Executive Summary of Phase 1
+The objective of the initial phase was to establish a reproducible development environment and assess the integrity, quality, and distribution of the financial news dataset (1.4 million rows). This document details the infrastructure setup, data validation steps, and critical statistical insights that informed the downstream modeling strategy.
 
 ---
 
-## Step 3: Exploratory Data Analysis (EDA)
+## 2. Infrastructure & Environment Configuration
 
-**Goal**: Visualize patterns in the data using your `eda_utils` module.
+To ensure **reproducibility** and **dependency isolation**, the project follows strict software engineering standards.
 
-### 3.1 Implement EDA Utils
-**Action**:
-1.  Open `src/eda_utils.py`.
-2.  Implement `plot_headline_length_distribution`:
-    *   Calculate length: `df['headline'].str.len()`.
-    *   Plot histogram using `plt.hist()` or `sns.histplot()`.
-3.  Implement `plot_publisher_counts`:
-    *   Count values: `df['publisher'].value_counts().head(top_n)`.
-    *   Plot bar chart.
-4.  Implement `plot_publication_frequency`:
-    *   Group by date and count.
-    *   Plot line chart.
+### 2.1 Virtual Environment Strategy
+A dedicated Python virtual environment was initialized to prevent dependency conflicts with the system runtime.
 
-### 3.2 Run EDA in Notebook
-**Action**:
-1.  Create `notebooks/03_EDA.ipynb`.
-2.  Import your processed data and your `eda_utils` functions.
-3.  **Headline Analysis**:
-    ```python
-    from eda_utils import plot_headline_length_distribution
-    plot_headline_length_distribution(news_df)
-    ```
-    *   *Markdown*: Explain what the distribution tells you. Are most headlines short or long?
-4.  **Publisher Analysis**:
-    ```python
-    from eda_utils import plot_publisher_counts
-    plot_publisher_counts(news_df)
-    ```
-    *   *Markdown*: Who are the top publishers?
-5.  **Time Series**:
-    ```python
-    from eda_utils import plot_publication_frequency
-    plot_publication_frequency(news_df)
-    ```
-    *   *Markdown*: Do you see spikes in news volume? Can you correlate them with known market events?
+```bash
+# Architecture: Windows / Git Bash
+python -m venv venv
+source venv/Scripts/activate
+````
+
+### 2.2 Dependency Management (`requirements.txt`)
+
+The following core libraries were selected for specific architectural reasons:
+
+  * **Pandas:** High-performance dataframe manipulation.
+  * **TA-Lib (Binary):** Chosen over standard TA-Lib for C++ compatibility on Windows environments without MSVC build tools.
+  * **VADER Sentiment:** Selected for its specialized lexicon optimized for short-text social/financial media (handling caps, punctuation, and intensity) compared to TextBlob.
+  * **YFinance:** Utilized for retrieving historical market data for validation.
+
+-----
+
+## 3\. Data Integrity & Preprocessing
+
+### 3.1 Dataset Specifications
+
+  * **Source:** Financial News Corpus (CSV)
+  * **Volume:** \~1,407,000 observations
+  * **Features:** Headline, Date, Publisher, Stock Ticker.
+
+### 3.2 Timezone Normalization (Critical Fix)
+
+During the ingestion layer, a schema mismatch was detected:
+
+  * **News Data:** ISO-8601 format with UTC offsets (e.g., `2020-06-05 14:30:00+00:00`).
+  * **Market Data:** Naive Datetime (e.g., `2020-06-05`).
+
+**Resolution:** An ETL transformation step was implemented to normalize all timestamps to `datetime64[ns]` and strip timezone awareness (`dt.tz_localize(None)`), ensuring accurate inner joins during the correlation phase.
+
+-----
+
+## 4\. Exploratory Data Analysis (EDA) Findings
+
+### 4.1 Temporal Distribution & Data Sparsity
+
+**Observation:** A time-series visualization revealed significant data sparsity between **2011 and 2018**, followed by an exponential surge in data volume during **2019-2020**.
+
+**Strategic Implication:**
+
+  * Model training and correlation analysis must be restricted to the **2019-2020 epoch**.
+  * Analyzing the sparse period (2011-2018) would introduce statistical noise and bias the correlation results due to insufficient sample size per day.
+
+### 4.2 Semantic Analysis (N-Grams)
+
+A Bigram (2-gram) frequency analysis was performed using `CountVectorizer` to understand the *nature* of the text.
+
+**Top Key Phrases:**
+
+1.  `"earnings per"`
+2.  `"price target"`
+3.  `"estimates q1"`
+4.  `"insider trading"`
+
+**Insight:** The corpus is highly **Quantitative and Event-Driven**. It focuses on hard financial metrics (Earnings calls, Analyst ratings) rather than general macroeconomic sentiment (e.g., "Economy is crashing").
+**Hypothesis:** This suggests that VADER sentiment scores will likely track *short-term volatility* effectively, as these headlines represent material information.
+
+### 4.3 Headline Statistics
+
+  * **Length Distribution:** Follows a near-normal distribution centered at **60-80 characters**.
+  * **Outliers:** Minimal outliers detected. No truncation or padding was required for the NLP pipeline.
+
+-----
+
+## 5\. Conclusion & Next Steps
+
+The EDA phase confirmed that the dataset is clean, structurally sound, and rich in event-driven financial text. The timezone discrepancies were resolved via the ETL pipeline.
+
+**Transition to Phase 2:**
+The analysis justifies the use of **Daily Aggregation** for sentiment scoring, as the high volume of news in 2020 allows for a statistically significant "Daily Mood" metric to be correlated against Daily Stock Returns.
+
+````
 
 ---
-
-## Step 4: Version Control
-
-**Action**:
-1.  **Commit your work**:
-    ```bash
-    git add .
-    git commit -m "feat: Complete Task 1 data pipeline and EDA"
-    ```
-2.  **Push**:
-    ```bash
-    git push origin task-1-eda
-    ```
-
-You are now ready for Task 2!

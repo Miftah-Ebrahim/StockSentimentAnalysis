@@ -1,4 +1,4 @@
-# Python
+# --- Python Basics ---
 __pycache__/
 *.py[cod]
 *$py.class
@@ -19,28 +19,36 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
-# Virtual Environment
+# --- Virtual Environment ---
 venv/
 env/
 ENV/
+.env
 
-# Jupyter Notebooks
+# --- Jupyter Notebooks ---
 .ipynb_checkpoints
 *-checkpoint.ipynb
 
-# VS Code
+# --- VS Code / IDE ---
 .vscode/
+.idea/
 
-# Environment Variables
-.env
-
-# Data
-data/raw/*
-!data/raw/.gitkeep
-data/processed/*
-!data/processed/.gitkeep
-data/
-venv/
-__pycache__/
+# --- Operating System Files ---
 .DS_Store
+Thumbs.db
+
+# --- DATA MANAGEMENT (Crucial) ---
+# 1. Ignore all files inside these folders
+data/raw/*
+data/processed/*
+
+# 2.keep the folders themselves (via the ghost file)
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# 3. Ignore large files in root (Safety net)
+*.csv
+*.xlsx
+*.zip
