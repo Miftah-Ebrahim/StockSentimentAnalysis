@@ -1,46 +1,29 @@
-# Python
+# --- Python Basics ---
 __pycache__/
 *.py[cod]
-*$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+.ipynb_checkpoints/
 
-# Virtual Environment
+# --- Virtual Environment ---
 venv/
 env/
-ENV/
-
-# Jupyter Notebooks
-.ipynb_checkpoints
-*-checkpoint.ipynb
-
-# VS Code
-.vscode/
-
-# Environment Variables
 .env
 
-# Data
+# --- VS Code Settings ---
+.vscode/
+
+# --- Project Data (The Important Part) ---
+# Ignore all files inside data subfolders...
 data/raw/*
-!data/raw/.gitkeep
 data/processed/*
+data/external/*
+
+# ...But keep the folders themselves (so the structure exists)
+!data/raw/.gitkeep
 !data/processed/.gitkeep
-data/
-venv/
-__pycache__/
-.DS_Store
+!data/external/.gitkeep
+
+# Ignore specific large files if they are in root (just in case)
+*.csv
+*.xlsx
