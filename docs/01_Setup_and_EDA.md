@@ -1,11 +1,4 @@
-----
-### Step 1: Update the File
 
-1.  Open **`docs/01_Setup_and_EDA.md`** in VS Code.
-2.  **Delete everything** inside.
-3.  **Copy and Paste** the following block:
-
-<!-- end list -->
 
 ````markdown
 # 📑 Technical Report: Environment Setup & Exploratory Data Analysis (EDA)
