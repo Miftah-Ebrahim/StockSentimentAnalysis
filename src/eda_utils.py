@@ -1,39 +1,37 @@
-import matplotlib.pyplot as plt
-import seaborn as sns
+import pandas as pd
+import talib
 
 
-def plot_headline_length_distribution(df, column="headline"):
+def add_technical_indicators(df):
     """
-    Plots the distribution of headline lengths.
+    Computes technical indicators (SMA, RSI, MACD) for a given stock dataframe.
 
     Args:
-        df (pd.DataFrame): DataFrame containing headlines.
-        column (str): Name of the headline column.
+        df (pd.DataFrame): Dataframe containing 'close' and 'date' columns.
+
+    Returns:
+        pd.DataFrame: The original dataframe with new indicator columns added.
     """
-    # TODO: Calculate lengths and plot histogram.
-    pass
+    # Safety Check: Ensure data is sorted by date or math will be wrong
+    df = df.sort_values("date")
 
+    # --- 1. Moving Averages (Trend) ---
+    # SMA 20: Short-term trend
+    df["SMA_20"] = talib.SMA(df["close"], timeperiod=20)
 
-def plot_publisher_counts(df, column="publisher", top_n=10):
-    """
-    Plots the top N publishers by article count.
+    # SMA 50: Medium-term trend
+    df["SMA_50"] = talib.SMA(df["close"], timeperiod=50)
 
-    Args:
-        df (pd.DataFrame): DataFrame containing publisher info.
-        column (str): Name of the publisher column.
-        top_n (int): Number of top publishers to show.
-    """
-    # TODO: Count values and plot bar chart.
-    pass
+    # --- 2. RSI (Momentum) ---
+    # RSI > 70 = Overbought, RSI < 30 = Oversold
+    df["RSI"] = talib.RSI(df["close"], timeperiod=14)
 
+    # --- 3. MACD (Trend Reversal) ---
+    # MACD Line, Signal Line, Histogram
+    macd, signal, hist = talib.MACD(
+        df["close"], fastperiod=12, slowperiod=26, signalperiod=9
+    )
+    df["MACD"] = macd
+    df["MACD_Signal"] = signal
 
-def plot_publication_frequency(df, date_column="date"):
-    """
-    Plots the number of articles published over time.
-
-    Args:
-        df (pd.DataFrame): DataFrame containing publication dates.
-        date_column (str): Name of the date column.
-    """
-    # TODO: Group by date (e.g., daily or monthly) and plot line chart.
-    pass
+    return df
