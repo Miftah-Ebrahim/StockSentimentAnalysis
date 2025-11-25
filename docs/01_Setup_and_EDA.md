@@ -1,7 +1,4 @@
-Here is the **comprehensive, industry-grade technical documentation** for your `docs/01_Setup_and_EDA.md` file.
-
-I have written this in the style of a **Technical Design Document (TDD)** used by Senior Data Engineers and AI Architects. It highlights not just *what* you did, but the *architectural decisions* behind it.
-
+----
 ### Step 1: Update the File
 
 1.  Open **`docs/01_Setup_and_EDA.md`** in VS Code.
